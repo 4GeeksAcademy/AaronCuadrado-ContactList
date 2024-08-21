@@ -1,42 +1,96 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			url: 'https://playground.4geeks.com',
+			agenda: 'Aaron Cuadrado',
+			contacts: [],
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+			getAgenda: () => {
+				const { url, agenda } = getStore()
+				const { createAgenda } = getActions()
+				fetch(`${url}/contact/agendas/${agenda}`)
+					.then((response) => {
+						console.log(response)
+						if (response.status === 404) createAgenda()
+						else return response.json()
+					})
+					.then((responseJson) => {
+						console.log(responseJson)
+						setStore({ contacts: responseJson.contacts })
+					})
 
-				//reset the global store
-				setStore({ demo: demo });
+			},
+
+			createAgenda: () => {
+				const { url, agenda } = getStore()
+				const { getAgenda } = getActions()
+				fetch(`${url}/contact/agendas/${agenda}`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' }
+				})
+					.then((response) => {
+						console.log(response)
+						if (response.status === 201) getAgenda()
+						return response.json()
+					})
+					.then((responseJson) => {
+						console.log(responseJson)
+					})
+			},
+
+			createContact: (datos) => {
+				const { url, agenda } = getStore()
+				const { getAgenda } = getActions()
+				console.log(datos)
+				fetch(`${url}/contact/agendas/${agenda}/contacts`, {
+					method: 'POST',
+					body: JSON.stringify(datos),
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+					.then((response) => {
+						if (response.status === 201) getAgenda()
+						return response.json()
+					})
+					.then((datos) => console.log(datos))
+			},
+
+			updateContact: (datos, id) => {
+				const { url, agenda } = getStore()
+				const { getAgenda } = getActions()
+				console.log(datos)
+				fetch(`${url}/contact/agendas/${agenda}/contacts/${id}`, {
+					method: 'PUT',
+					body: JSON.stringify(datos),
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+					.then((response) => {
+						if (response.status === 200) getAgenda()
+						return response.json()
+					})
+					.then((datos) => console.log(datos))
+			},
+
+			deleteContact: (id) => {
+				const { url, agenda } = getStore()
+				const { getAgenda } = getActions()
+				fetch(`${url}/contact/agendas/${agenda}/contacts/${id}`, {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+					.then((response) => {
+						console.log(response)
+						if (response.status === 204) getAgenda()
+						return response.json()
+					})
+					.then((datos) => console.log(datos))
 			}
 		}
 	};
