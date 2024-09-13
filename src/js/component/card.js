@@ -12,7 +12,7 @@ const Card = ({ id, name, email, phone, address, onClick }) => {
                 <div className="col-md-7">
                     <div className="card-body d-flex flex-column justify-content-center h-100">
                         <h4 className="card-title">{name}</h4>
-                        <h5 className="card"></h5>
+                        
                         <p className="card-text mb-1"><i class="bi bi-telephone-fill"></i> {phone}</p>
                         <p className="card-text mb-1"><i class="bi bi-envelope"></i> {email}</p>
                         <p className="card-text mb-1"><i className="bi bi-geo-alt-fill"></i> {address}</p>
